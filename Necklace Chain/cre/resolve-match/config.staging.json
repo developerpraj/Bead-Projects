@@ -1,0 +1,6 @@
+{
+  "chainSelectorName": "ethereum-testnet-sepolia-base-1",
+  "receiverAddress": "0x0000000000000000000000000000000000000000",
+  "apiBaseUrl": "https://v3.football.api-sports.io",
+  "gasLimit": "500000"
+}

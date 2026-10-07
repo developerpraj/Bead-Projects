@@ -1,0 +1,24 @@
+# Necklace Chain: toolchain requirements for a new machine.
+#
+# This is a Solidity/TypeScript project, not a Python one. pip cannot install any of these tools, so every line below is a
+# comment and `pip install -r requirements.txt` is a harmless no-op. To set up a machine, install the tools in section 1
+# and then run:   ./scripts/setup.ps1
+#
+# 1. Tools to install by hand (versions used to build and verify the project)
+#   Foundry (forge, anvil, cast)   1.8.5    https://getfoundry.sh        -> contracts, tests, local forks
+#   Node.js + npm                  24.21.0 / 11.19.0                      -> webapp and CRE workflow (Node 24+ needed for TypeScript tests)
+#   Chainlink CRE CLI (cre)        1.37.0   https://docs.chain.link/cre  -> workflow simulate/deploy; needs `cre login` (browser + 2FA)
+#   PowerShell                     5.1+     (the helper scripts are .ps1)
+#   Solidity compiler              0.8.24   (Foundry downloads it automatically)
+#
+# 2. Installed by ./scripts/setup.ps1 (pinned by lockfiles, nothing to do manually)
+#   contracts/lib   forge-std v1.17.0, openzeppelin-contracts v5.7.0, openzeppelin-contracts-upgradeable v5.7.0   (forge install --no-git)
+#   webapp          npm ci   (next 16, react 19, wagmi 3, viem 2, tailwind 4)
+#   cre/resolve-match   npm ci   (@chainlink/cre-sdk 1.23, viem 2, typescript 7)
+#
+# 3. Per-machine settings
+#   Windows behind a TLS-inspecting proxy:   $env:NODE_OPTIONS = "--use-system-ca"
+#   Copy cre/.env.example and webapp/.env.example to cre/.env and webapp/.env.local (setup.ps1 does this) and fill them in. Never commit real keys.
+#   contracts/.env is only for real deploys: Foundry auto-loads it, so a filled-in file changes what `forge test` sees. Create it when deploying and
+#   delete it afterwards (./scripts/verify-all.ps1 clears the same variables from the shell, but not from a .env file).
+#   This project deliberately has no git repository; do not run `git init`.

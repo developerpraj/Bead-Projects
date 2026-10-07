@@ -1,0 +1,6 @@
+# CRE project settings. Target names must match the targets in each workflow.yaml.
+# RPC URLs here are used by `cre workflow simulate` and by the deployed workflow's chain reads.
+staging-settings:
+  rpcs:
+    - chain-name: ethereum-testnet-sepolia-base-1
+      url: https://sepolia.base.org

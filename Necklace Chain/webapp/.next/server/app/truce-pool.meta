@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/truce-pool/layout,_N_T_/truce-pool/page,_N_T_/truce-pool"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/truce-pool/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 64,
+    "slots": {
+      "children": {
+        "hints": 96,
+        "slots": {
+          "children": {
+            "hints": 160,
+            "slots": null
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/34a990412a19d1fb94b05198bdb65d8f79ee6c8d591377d103dbc48335ab9cde/$/truce-pool",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/truce-pool/page"
+    },
+    "isFallback": false
+  }
+}

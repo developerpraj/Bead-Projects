@@ -1,0 +1,34 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/forge/layout,_N_T_/forge/page,_N_T_/forge"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/forge/__PAGE__"
+  ],
+  "prefetchHints": {
+    "hints": 64,
+    "slots": {
+      "children": {
+        "hints": 96,
+        "slots": {
+          "children": {
+            "hints": 160,
+            "slots": null
+          }
+        }
+      }
+    }
+  },
+  "routeCache": {
+    "key": "/route-cache/APP_PAGE/dd9b80b4296ab0952f3c3cd99fa9b51dba6682c08f61da92844cda5d264c49c0/$/forge",
+    "owner": {
+      "kind": "APP_PAGE",
+      "sourceRoute": "/forge/page"
+    },
+    "isFallback": false
+  }
+}

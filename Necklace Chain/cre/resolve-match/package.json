@@ -1,0 +1,19 @@
+{
+  "name": "resolve-match",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.mock.json",
+    "test": "node --test outcome.test.ts mock/mock.test.ts",
+    "mock:api": "node mock/api-football-server.ts"
+  },
+  "dependencies": {
+    "@chainlink/cre-sdk": "^1.23.0",
+    "viem": "^2.57.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "typescript": "^7.0.2"
+  }
+}

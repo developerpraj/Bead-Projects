@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Necklace Chain ($BEAD) - Project guide</title>
+<meta name="description" content="What Necklace Chain is, how it works, and everything the team and engineers need to run it.">
+<style>
+  :root {
+    --bg: #fbfaf7; --panel: #ffffff; --ink: #1d1b2e; --muted: #5f5c75; --line: #e4e1d8;
+    --accent: #b4322c; --accent2: #2c4fb4; --ok: #1f7a4d; --warn: #a96a00; --code: #f1efe8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #14131c; --panel: #1d1c29; --ink: #ecebf4; --muted: #a6a3bd; --line: #33314a;
+            --accent: #ff7a70; --accent2: #8aa4ff; --ok: #62d49a; --warn: #f0b252; --code: #262538; }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent2); }
+  header.hero { padding: 3rem 1.25rem 2rem; text-align: center; border-bottom: 1px solid var(--line); }
+  header.hero h1 { margin: 0 0 .25rem; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -.02em; }
+  header.hero p.tag { margin: 0 auto 1rem; max-width: 46rem; color: var(--muted); font-size: 1.15rem; }
+  .badge { display: inline-block; padding: .2rem .65rem; border-radius: 999px; border: 1px solid var(--warn); color: var(--warn); font-size: .85rem; }
+  nav.bar { position: sticky; top: 0; z-index: 5; background: var(--panel); border-bottom: 1px solid var(--line);
+            display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; padding: .5rem 1.25rem; }
+  nav.bar .links { display: flex; flex-wrap: wrap; gap: .25rem .9rem; font-size: .92rem; }
+  nav.bar .links a { text-decoration: none; color: var(--muted); }
+  nav.bar .links a:hover { color: var(--ink); }
+  .aud { display: flex; gap: .25rem; }
+  .aud button { font: inherit; font-size: .88rem; padding: .3rem .8rem; border: 1px solid var(--line); background: transparent; color: var(--ink);
+                border-radius: 999px; cursor: pointer; }
+  .aud button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  main { max-width: 62rem; margin: 0 auto; padding: 1rem 1.25rem 4rem; }
+  section.block { margin: 2.5rem 0; }
+  section.block[hidden] { display: none; }
+  h2 { font-size: 1.7rem; margin: 0 0 .25rem; letter-spacing: -.01em; }
+  h3 { font-size: 1.2rem; margin: 1.6rem 0 .4rem; }
+  .for { display: inline-block; font-size: .75rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: .75rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: .75rem; margin: 1rem 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: .9rem 1rem; }
+  .card b { display: block; font-size: 1.35rem; }
+  .card span { color: var(--muted); font-size: .88rem; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: .75rem; padding: 1rem 1.25rem; margin: 1rem 0; }
+  .note { border-left: 4px solid var(--warn); background: var(--panel); padding: .75rem 1rem; border-radius: 0 .5rem .5rem 0; margin: 1rem 0; }
+  .note.ok { border-color: var(--ok); }
+  table { width: 100%; border-collapse: collapse; margin: .75rem 0; font-size: .93rem; background: var(--panel); }
+  th, td { text-align: left; padding: .5rem .7rem; border: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--code); }
+  code, pre { font-family: ui-monospace, Consolas, "Cascadia Mono", monospace; font-size: .86rem; }
+  code { background: var(--code); padding: .08rem .3rem; border-radius: .3rem; }
+  pre { background: var(--code); padding: .85rem 1rem; border-radius: .6rem; overflow-x: auto; position: relative; }
+  pre code { background: none; padding: 0; }
+  pre button.copy { position: absolute; top: .4rem; right: .4rem; font-size: .72rem; padding: .15rem .5rem; border: 1px solid var(--line);
+                    background: var(--panel); color: var(--ink); border-radius: .35rem; cursor: pointer; }
+  .steps { list-style: none; counter-reset: s; padding: 0; margin: 1rem 0; display: grid; gap: .6rem; }
+  .steps li { counter-increment: s; background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; padding: .7rem 1rem .7rem 3rem; position: relative; }
+  .steps li::before { content: counter(s); position: absolute; left: .85rem; top: .7rem; width: 1.5rem; height: 1.5rem; border-radius: 50%;
+                      background: var(--accent); color: #fff; display: grid; place-items: center; font-size: .8rem; font-weight: 700; }
+  .flow { display: flex; flex-wrap: wrap; gap: .5rem; align-items: stretch; margin: 1rem 0; }
+  .flow .node { flex: 1 1 8.5rem; background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; padding: .6rem .7rem; font-size: .86rem; }
+  .flow .node b { display: block; color: var(--accent); }
+  .flow .arrow { align-self: center; color: var(--muted); }
+  svg { max-width: 100%; height: auto; }
+  svg text { fill: var(--ink); font: 12px system-ui, sans-serif; }
+  svg .st { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+  svg .ok { stroke: var(--ok); } svg .bad { stroke: var(--accent); }
+  svg path { stroke: var(--muted); fill: none; stroke-width: 1.4; marker-end: url(#ah); }
+  details { background: var(--panel); border: 1px solid var(--line); border-radius: .6rem; padding: .5rem 1rem; margin: .5rem 0; }
+  summary { cursor: pointer; font-weight: 600; }
+  .tag-ok { color: var(--ok); font-weight: 600; } .tag-todo { color: var(--warn); font-weight: 600; }
+  footer { border-top: 1px solid var(--line); padding: 1.5rem 1.25rem 3rem; color: var(--muted); font-size: .85rem; max-width: 62rem; margin: 0 auto; }
+  @media print { nav.bar, .aud, pre button.copy { display: none; } section.block[hidden] { display: block; } body { background: #fff; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <h1>Necklace Chain <span style="color:var(--accent)">$BEAD</span></h1>
+  <p class="tag">Sports rivalry turned into a shared game: fans of opposing sides stake together, a fair-play "truce" rewards balance, and one percent of every move goes to public goods.</p>
+  <span class="badge">Pilot build &middot; testnet rehearsal only &middot; not audited &middot; not an investment</span>
+</header>
+
+<nav class="bar" aria-label="Page navigation">
+  <div class="links">
+    <a href="#glance">At a glance</a><a href="#public">The idea</a><a href="#whitepaper">Whitepaper</a><a href="#how">How it works</a>
+    <a href="#team">Team guide</a><a href="#engineer">Engineer guide</a><a href="#status">Status</a><a href="#assessment">Honest assessment</a><a href="#cases">Case studies</a><a href="#conclusion">Findings</a><a href="#alternatives">Alternatives</a><a href="#recommendations">Recommendations</a><a href="#sectors">Future sectors</a><a href="#glossary">Glossary</a>
+  </div>
+  <div class="aud" role="group" aria-label="Show content for">
+    <button type="button" data-aud="all" aria-pressed="true">Everyone</button>
+    <button type="button" data-aud="public" aria-pressed="false">Public</button>
+    <button type="button" data-aud="team" aria-pressed="false">Team</button>
+    <button type="button" data-aud="eng" aria-pressed="false">Engineers</button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ============================ AT A GLANCE ============================ -->
+<section class="block" id="glance" data-for="public team eng">
+  <h2>At a glance</h2>
+  <div class="cards">
+    <div class="card"><b>Base</b><span>Chain (mainnet 8453, rehearsal on Base Sepolia 84532)</span></div>
+    <div class="card"><b>13.8 billion</b><span>$BEAD hard supply cap, fixed at deploy</span></div>
+    <div class="card"><b>1%</b><span>Peace Tax on every transfer, sent to Protocol Guild</span></div>
+    <div class="card"><b>30 minutes</b><span>Challenge window before any match result becomes final</span></div>
+    <div class="card"><b>Gasless</b><span>Players need no ETH: a paymaster covers network fees</span></div>
+    <div class="card"><b>129 tests</b><span>Passing, incl. fuzz and invariant tests</span></div>
+  </div>
+  <div class="note"><b>Honest status:</b> all code is written and verified offline, and a full rehearsal passes on a local fork of Base Sepolia using the real UMA oracle contract.
+  Nothing has been deployed to a live network yet, and the contracts have not had a professional audit. See <a href="#status">Status</a>.</div>
+</section>
+
+<!-- ============================ PUBLIC ============================ -->
+<section class="block" id="public" data-for="public team">
+  <h2>What is Necklace Chain?</h2>
+  <span class="for">For everyone</span>
+  <p>Rival fans usually only meet on the pitch. Necklace Chain gives them a reason to meet in the middle. It is inspired by the <em>Ekecheiria</em>, the ancient Olympic truce,
+  and runs as a game inside Telegram on the Base network.</p>
+
+  <h3>The game in four moves</h3>
+  <ol class="steps">
+    <li><b>Pick a side and stake.</b> For a match (the pilot is the unbranded "North Red vs North White" derby), you stake $BEAD on the Red or the White side of the <em>Truce Pool</em>.
+      Your wallet is locked to that side for that match.</li>
+    <li><b>The match is played.</b> Staking closes at kickoff. The result is read from a sports-data feed and published on-chain, then there is a 30-minute window in which anyone qualified can challenge a wrong result.</li>
+    <li><b>The truce test.</b> If both sides took part in a balanced way (the smaller side holds at least 30% of the pool), the truce holds and every holder gets their stake back <em>plus</em> an equal share of a bonus pool funded in advance.
+      If the pool was lopsided, everyone simply gets their stake back (1:1). If the match is cancelled, everyone is refunded.</li>
+    <li><b>Forge a Cosmic Necklace (optional).</b> Collect 54 tokens of each side (trading with a rival fan) and burn them to forge a one-of-a-kind NFT, the <em>Rama Node</em>.
+      You give up that match's bonus in exchange for a lasting badge that grows in rank the longer you keep it.</li>
+  </ol>
+
+  <h3>Why it exists</h3>
+  <div class="cards">
+    <div class="card"><b>Balance is rewarded</b><span>The bonus only pays when both sides are represented, so nobody profits from a one-sided pile-on.</span></div>
+    <div class="card"><b>Public good built in</b><span>1% of transfers goes straight to Protocol Guild, which funds Ethereum core contributors. No one at Necklace Chain holds it.</span></div>
+    <div class="card"><b>Fair results</b><span>Results come from a decentralised oracle network and a 30-minute challenge window, not from a person with a button.</span></div>
+    <div class="card"><b>Easy to use</b><span>A smart wallet with passkeys (Face ID / fingerprint) and sponsored fees, inside a Telegram mini-app.</span></div>
+  </div>
+
+  <h3>Common questions</h3>
+  <details><summary>Is this an investment?</summary>
+    <p>No. $BEAD is a game token. There is no yield for holding it, no pre-sale and no promise of profit. The truce bonus is a game reward paid from a pool funded in advance for a specific match.
+    You can lose value (for example through the 1% tax or market moves) and nothing here is financial advice.</p></details>
+  <details><summary>Can I get my stake back?</summary>
+    <p>Before kickoff you can withdraw what you staked (the 1% deposit tax is not returned). After a result, you claim your staked amount back one-for-one even if the truce fails. If a match is cancelled or the data feed goes silent for 48 hours, everyone is refunded their staked amount. The 1% deposit tax is never returned, even on a refund.
+    Claims never expire.</p></details>
+  <details><summary>Who decides the result?</summary>
+    <p>A Chainlink network reads the result from a sports-data API and reports it on-chain. UMA's optimistic oracle then holds it for 30 minutes so a wrong result can be challenged. Anyone who has staked at least 33 $BEAD (a "Chotki")
+    can challenge by posting a bond; a frivolous challenge loses that bond.</p></details>
+  <details><summary>Are the contracts safe?</summary>
+    <p>They are heavily tested (129 automated tests, including randomised and invariant testing) and the first release is a deliberately small "guarded pilot": one match, with a hard cap on how much can be staked.
+    They have <strong>not</strong> had a professional audit, so treat it as experimental.</p></details>
+  <details><summary>Is it connected to a real club or league?</summary>
+    <p>No. The pilot uses culturally inspired, unbranded names. There is no affiliation with any club, league or federation.</p></details>
+  <details><summary>Do I need crypto or ETH?</summary>
+    <p>You need $BEAD to stake. You do not need ETH: network fees for the supported actions are sponsored by the project's paymaster (within daily limits).</p></details>
+</section>
+
+<!-- ============================ WHITEPAPER ============================ -->
+<section class="block" id="whitepaper" data-for="public team eng">
+  <h2>Whitepaper (as built)</h2>
+  <span class="for">Concise protocol description, matching the code in this repository</span>
+
+  <h3>1. Abstract</h3>
+  <p>Necklace Chain is a Base-chain protocol that turns sports rivalries into a cooperative staking game. Opposing fans stake the same token into a per-match <em>Truce Pool</em>.
+  A symmetry rule rewards balanced participation. Participants can burn equal amounts of both sides' receipt tokens to forge a non-financial NFT credential. A fixed 1% Peace Tax on transfers
+  is forwarded, in the same transaction and without custody, to a public-goods recipient.</p>
+
+  <h3>2. Token: $BEAD</h3>
+  <table>
+    <tr><th>Property</th><th>Value</th></tr>
+    <tr><td>Standard</td><td>ERC-20, fixed supply minted once at deploy</td></tr>
+    <tr><td>Hard cap</td><td>13,800,000,000 $BEAD</td></tr>
+    <tr><td>Peace Tax</td><td>1% of each transfer, forwarded to Protocol Guild's Base split contract (<code>0xffaaCCFe120f3fC47f42102cF4F28e837cd49A20</code>)</td></tr>
+    <tr><td>Dust rule</td><td>Taxed transfers below 100 whole tokens revert (keeps the tax meaningful)</td></tr>
+    <tr><td>Exemptions</td><td>A small allow-list (pool, staking, vesting wallets) is exempt so deposits and stakes are exact; the list can be frozen forever by renouncing ownership</td></tr>
+  </table>
+  <h3>3. Genesis allocation</h3>
+  <table>
+    <tr><th>Bucket</th><th>Share</th><th>Notes</th></tr>
+    <tr><td>Ecosystem</td><td>40%</td><td>Funds match reward pools and gameplay rewards</td></tr>
+    <tr><td>Treasury</td><td>20%</td><td>Held by the genesis treasury wallet; the 1% tax is separate and is never accumulated by the protocol</td></tr>
+    <tr><td>Core team</td><td>15%</td><td>Vesting wallet: 4 years total, 1-year cliff</td></tr>
+    <tr><td>DEX liquidity</td><td>15%</td><td>Liquidity seeding; a lockup contract is planned for a later phase</td></tr>
+    <tr><td>Private seed</td><td>10%</td><td>Vesting wallet: 2 years total, 6-month cliff</td></tr>
+  </table>
+
+  <h3>4. The Truce Pool</h3>
+  <p>Each match has one pool with a state machine: <code>OPEN</code> &rarr; <code>LOCKED</code> &rarr; <code>PENDING_RESOLUTION</code> &rarr; <code>SETTLED</code> or <code>REFUNDED</code>, with a <code>DISPUTED</code> sub-state.
+  Depositing mints a 1:1 receipt token for your side (after the 1% tax). Rules that protect participants:</p>
+  <ul>
+    <li><b>One side per wallet per match</b> (an affiliation lock), so a single wallet cannot hold both sides to forge for free.</li>
+    <li><b>Symmetry floor:</b> the bonus pays only if the smaller side holds at least 30% of the pool.</li>
+    <li><b>50-block hold</b> on deposits before they can be claimed, blunting flash-loan and last-second tactics.</li>
+    <li><b>Pool cap:</b> a fixed maximum amount of $BEAD per match bounds worst-case exposure in the pilot.</li>
+    <li><b>Fail-safes:</b> refund if no oracle result arrives within 48 hours of kickoff; a disputed match that is not resolved within 7 days is refunded.</li>
+  </ul>
+  <h3>5. Cosmic Necklace (Rama Node NFT)</h3>
+  <p>Burning 54 Home and 54 Away receipt tokens (and the matching 108 $BEAD of principal) mints an ERC-721. It carries <strong>no monetary yield</strong>. Its utility is non-financial and read on-chain:
+  voting weight (1&times; to 6&times; as tenure grows in 108-day cycles), a fee-rebate tier (0% / 15% / 30%), and a cosmetic rank. Any transfer resets the tenure.</p>
+  <h3>6. Governance and staking tiers</h3>
+  <table>
+    <tr><th>Tier</th><th>Stake</th><th>Role</th></tr>
+    <tr><td>The Chai</td><td>18 $BEAD</td><td>Participation and polls</td></tr>
+    <tr><td>The Chotki</td><td>33 $BEAD</td><td>May challenge an oracle result by posting a bond; the stake is slashed to the public-goods forwarder if the challenge is rejected</td></tr>
+    <tr><td>The Master Council</td><td>99 $BEAD, 99 seats</td><td>Off-chain votes (Snapshot) on match whitelisting, dispute escalation and an emergency circuit breaker. <strong>No control over any funds.</strong></td></tr>
+  </table>
+  <p>Passed votes are executed on-chain by a multisig (Gnosis Safe) acting as the Council Executor. There is no on-chain governor in V1.</p>
+  <h3>7. Oracle and disputes</h3>
+  <p>Results come from a Chainlink Runtime Environment (CRE) workflow that reads a sports API and reaches consensus across nodes, then delivers a signed report on-chain. The report opens a UMA Optimistic Oracle V3 assertion with a
+  30-minute challenge window. Undisputed assertions finalise automatically; disputed ones follow UMA's resolution and the pool's refund rules.</p>
+  <h3>8. Treasury and public good</h3>
+  <p>The Peace Tax is forwarded inside the same transaction by an immutable pass-through contract that never holds a balance. The recipient is fixed at deployment.</p>
+  <h3>9. Principal risks</h3>
+  <ul>
+    <li><b>Smart-contract risk:</b> unaudited code. Mitigated by tests, a small pilot and a hard pool cap, not eliminated.</li>
+    <li><b>Oracle and data-source risk:</b> a wrong result is possible; the challenge window and refund paths limit but do not remove this.</li>
+    <li><b>Regulatory risk:</b> the design avoids passive yield and pre-sales, but classification of tokens varies by jurisdiction. Legal review is pending.</li>
+    <li><b>Market and liquidity risk:</b> a new token can be illiquid and volatile.</li>
+    <li><b>Dependency risk:</b> Base, Chainlink CRE, UMA, the Coinbase Smart Wallet and Telegram.</li>
+  </ul>
+  <h3>10. Roadmap</h3>
+  <table>
+    <tr><th>Phase</th><th>Scope</th><th>State</th></tr>
+    <tr><td>V1 pilot</td><td>One derby, one pool, Telegram mini-app, guarded caps</td><td class="tag-ok">Code complete</td></tr>
+    <tr><td>Testnet</td><td>Live Base Sepolia rehearsal with the real CRE network</td><td class="tag-todo">Needs account access</td></tr>
+    <tr><td>Mainnet pilot</td><td>Real addresses, legal review, Council multisig</td><td class="tag-todo">Not started</td></tr>
+    <tr><td>Later</td><td>Liquidity lockup contract, more matches, optional audit, possible foundation structure</td><td class="tag-todo">Planned</td></tr>
+  </table>
+  <p class="note">This page is a technical and product description, not an offer or solicitation, and not legal, tax or financial advice.</p>
+</section>
+
+<!-- ============================ HOW IT WORKS ============================ -->
+<section class="block" id="how" data-for="public team eng">
+  <h2>How it works</h2>
+  <h3>A match from start to finish</h3>
+  <svg viewBox="0 0 760 150" role="img" aria-label="Match state machine">
+    <defs><marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" style="fill:var(--muted);stroke:none"/></marker></defs>
+    <rect class="st" x="8" y="45" width="95" height="40" rx="8"/><text x="55" y="70" text-anchor="middle">OPEN</text>
+    <rect class="st" x="148" y="45" width="95" height="40" rx="8"/><text x="195" y="70" text-anchor="middle">LOCKED</text>
+    <rect class="st" x="288" y="45" width="130" height="40" rx="8"/><text x="353" y="70" text-anchor="middle" style="font-size:11px">PENDING_RESOLUTION</text>
+    <rect class="st ok" x="470" y="10" width="95" height="40" rx="8"/><text x="517" y="35" text-anchor="middle">SETTLED</text>
+    <rect class="st bad" x="470" y="90" width="95" height="40" rx="8"/><text x="517" y="115" text-anchor="middle">REFUNDED</text>
+    <rect class="st" x="610" y="45" width="130" height="40" rx="8"/><text x="675" y="70" text-anchor="middle">claims (pull-based)</text>
+    <path d="M103 65 H148"/><path d="M243 65 H288"/><path d="M418 55 L470 35"/><path d="M418 75 L470 105"/><path d="M565 30 L610 55"/><path d="M565 110 L610 75"/>
+    <text x="55" y="38" text-anchor="middle" style="fill:var(--muted)">stake</text>
+    <text x="195" y="38" text-anchor="middle" style="fill:var(--muted)">kickoff</text>
+    <text x="353" y="38" text-anchor="middle" style="fill:var(--muted)">30 min window</text>
+    <text x="353" y="118" text-anchor="middle" style="fill:var(--muted)">cancelled / silent 48h / disputed</text>
+  </svg>
+
+  <h3>Where the result comes from</h3>
+  <div class="flow">
+    <div class="node"><b>1 Request</b>Owner or keeper calls <code>requestMatchResult</code>; an event is emitted</div><div class="arrow">&rarr;</div>
+    <div class="node"><b>2 CRE workflow</b>Nodes read the sports API and must agree on one outcome</div><div class="arrow">&rarr;</div>
+    <div class="node"><b>3 Forwarder</b>A signed report is delivered to <code>MatchResultReceiver</code></div><div class="arrow">&rarr;</div>
+    <div class="node"><b>4 UMA</b>Resolver opens a bonded assertion, 30-minute window</div><div class="arrow">&rarr;</div>
+    <div class="node"><b>5 Settle</b>Anyone calls <code>finalizeSettlement</code>; holders claim</div>
+  </div>
+  <p>Outcome codes: <code>1</code> home win, <code>2</code> away win, <code>3</code> draw, <code>4</code> cancelled/refund. Unfinished matches report nothing and are retried.</p>
+
+  <h3>A worked example (from the rehearsal)</h3>
+  <p>A Red fan and a White fan each deposit 1,000 $BEAD. The 1% tax leaves 990 each. The match is drawn, the truce holds (50/50 &ge; 30%), and a 1,000 $BEAD bonus pool is split equally:
+  each fan claims <strong>990 + 500 = 1,490 $BEAD</strong>. If one side had been under 30% of the pool, each would just claim their 990 back.</p>
+
+  <h3>Gasless play</h3>
+  <p>The Telegram mini-app signs a UserOperation with the player's passkey wallet and attaches the project paymaster. The paymaster only sponsors a short allow-list of calls (approve, deposit, withdraw early, claim, forge, stake, unstake)
+  with per-action and daily spending limits, so it cannot be drained by arbitrary transactions.</p>
+</section>
+
+<!-- ============================ TEAM ============================ -->
+<section class="block" id="team" data-for="team">
+  <h2>Team guide</h2>
+  <span class="for">Product, operations, legal and community</span>
+
+  <h3>What is finished, what is not</h3>
+  <table>
+    <tr><th>Area</th><th>State</th><th>Owner action</th></tr>
+    <tr><td>Smart contracts</td><td class="tag-ok">Complete, 129 tests passing</td><td>Decide on an external audit before any large pool</td></tr>
+    <tr><td>Oracle workflow</td><td class="tag-ok">Written and rehearsed with mocks</td><td class="tag-todo">Needs a Chainlink CRE account, deploy approval and an API-Football key</td></tr>
+    <tr><td>Telegram mini-app</td><td class="tag-ok">Built (5 pages)</td><td class="tag-todo">Test on real phones; set contract addresses after deploy</td></tr>
+    <tr><td>Testnet launch</td><td class="tag-todo">Ready to run</td><td>Fund the test wallet from a faucet</td></tr>
+    <tr><td>Mainnet</td><td class="tag-todo">Not started</td><td>Real wallets, Council multisig, legal review, Protocol Guild contact</td></tr>
+  </table>
+
+  <h3>Decisions and inputs needed from the team</h3>
+  <ul>
+    <li><b>Wallets:</b> real addresses for ecosystem, treasury, liquidity and the vesting beneficiaries; a Gnosis Safe (suggested 3-of-5) as Council Executor.</li>
+    <li><b>Vesting:</b> team 4y/1y cliff and seed 2y/6mo cliff are approved assumptions; confirm against signed agreements.</li>
+    <li><b>Protocol Guild:</b> contact them before sending any funds to their split (their docs ask for a test transaction first).</li>
+    <li><b>Pool cap and bonus size</b> for the first real match (fixed in $BEAD, there is no price oracle).</li>
+    <li><b>Legal:</b> token classification review, terms of use, no-pre-sale messaging, club/league trademark guardrails.</li>
+    <li><b>Liquidity:</b> venue, amount, and the lockup contract planned for a later phase.</li>
+  </ul>
+
+  <h3>Launch checklist</h3>
+  <ol class="steps">
+    <li>Testnet: log in to CRE, fund the test wallet, add the API key, run the documented sequence (see the Engineer guide).</li>
+    <li>Phone test of the mini-app and wallet on iOS and Android, including a sponsored transaction.</li>
+    <li>Verify mainnet addresses (UMA, forwarder, wallet factory) against official sources, set the real wallets and Safe.</li>
+    <li>Legal sign-off and publish terms; decide on audit.</li>
+    <li>Deploy, lock identity checks on the oracle receiver, seed the paymaster, create the first match with a capped pool.</li>
+  </ol>
+
+  <h3>Communication guardrails</h3>
+  <ul>
+    <li>Call it a game and a community mechanism. Never promise returns, yield or price appreciation.</li>
+    <li>Do not use real club names, crests or league marks. Use the cultural derby names.</li>
+    <li>Be explicit that the pilot is unaudited and capped.</li>
+    <li>The 1% Peace Tax goes to Protocol Guild automatically; the team does not hold or direct it.</li>
+  </ul>
+
+  <h3>Operational roles</h3>
+  <table>
+    <tr><th>Role</th><th>Who</th><th>Can do</th></tr>
+    <tr><td>Council Executor</td><td>Gnosis Safe</td><td>Create matches, circuit-break/refund, receiver settings</td></tr>
+    <tr><td>Keeper</td><td>One hot key</td><td>Only request a match result; cannot change settings</td></tr>
+    <tr><td>Deployer</td><td>Setup key</td><td>One-time wiring during deployment; then ownership is renounced or handed to the Safe</td></tr>
+    <tr><td>Challenger</td><td>Any Chotki (33 $BEAD)</td><td>Challenge a result inside the 30-minute window</td></tr>
+  </table>
+</section>
+
+<!-- ============================ ENGINEER ============================ -->
+<section class="block" id="engineer" data-for="eng">
+  <h2>Engineer guide</h2>
+  <span class="for">Everything needed to build, test, deploy and operate</span>
+
+  <h3>Repository map</h3>
+  <table>
+    <tr><th>Path</th><th>What</th></tr>
+    <tr><td><code>contracts/</code></td><td>Foundry project (Solidity 0.8.24, OpenZeppelin v5.7, cancun EVM). <code>src/</code>, <code>test/</code>, <code>script/</code></td></tr>
+    <tr><td><code>cre/resolve-match/</code></td><td>Chainlink CRE workflow (TypeScript): <code>main.ts</code>, <code>outcome.ts</code>, <code>abi.ts</code>, <code>mock/</code> (local API and relay)</td></tr>
+    <tr><td><code>webapp/</code></td><td>Next.js 16 + wagmi 3 + viem + Tailwind 4 Telegram mini-app, <code>/api/paymaster</code> route</td></tr>
+    <tr><td><code>scripts/</code></td><td><code>setup.ps1</code> (install deps), <code>verify-all.ps1</code> (all checks)</td></tr>
+    <tr><td><code>docs/</code></td><td><a href="ARCHITECTURE.md">ARCHITECTURE.md</a>, <a href="PLAN.md">PLAN.md</a>, <a href="PLAN_LOG.md">PLAN_LOG.md</a>; also <a href="../HANDOFF.md">HANDOFF.md</a>, <a href="../cre/README.md">cre/README.md</a></td></tr>
+  </table>
+
+  <h3>Quick start</h3>
+  <pre><button class="copy" type="button">Copy</button><code># one time, after installing Foundry 1.8.5, Node 24, CRE CLI 1.37 (see requirements.txt)
+./scripts/setup.ps1
+# everything: forge tests (unit/fuzz/invariant), CRE type-check + tests, webapp build, npm audits
+./scripts/verify-all.ps1
+# contracts only
+cd contracts; forge test
+# CRE workflow offline tests
+cd cre/resolve-match; npm run typecheck; npm test</code></pre>
+
+  <h3>Contracts</h3>
+  <table>
+    <tr><th>Contract</th><th>Role and key parameters</th></tr>
+    <tr><td><code>BeadToken</code></td><td>ERC-20, 13.8B cap, <code>PEACE_TAX_BPS=100</code>, <code>DUST_THRESHOLD=100e18</code>, <code>feeExempt</code> list, one-time <code>setTreasuryForwarder</code></td></tr>
+    <tr><td><code>TreasuryForwarder</code></td><td>Immutable pass-through to the public-goods address; never keeps a balance</td></tr>
+    <tr><td><code>EkecheiriaPool</code></td><td>Vault + truce state machine. <code>SYMMETRY_BPS=3000</code>, <code>HOLD_BLOCKS=50</code>, <code>CHALLENGE_WINDOW=30m</code>, <code>ORACLE_SILENCE=48h</code>, <code>DISPUTE_TIMEOUT=7d</code>, <code>MIN_DEPOSIT=100e18</code>; <code>wire(registry, necklace, resolver)</code> once</td></tr>
+    <tr><td><code>MatchRegistry</code></td><td><code>createMatch</code> clones two <code>FactionToken</code>s (EIP-1167), funds the reward pool atomically; bootstrap authority then <code>renounceBootstrap</code> to the Council Executor</td></tr>
+    <tr><td><code>FactionToken</code></td><td>Initializable ERC-20 receipt; mint/burn restricted to pool, burn to necklace</td></tr>
+    <tr><td><code>CosmicNecklace</code></td><td>ERC-721. <code>forgeDiplomaticNecklace(matchId)</code> burns 54+54, pool burns 108 BEAD via <code>onForge</code>. Tenure: <code>CYCLE_DURATION=108d</code>, voting weight 1-6, fee rebate 0/15/30%</td></tr>
+    <tr><td><code>TierStaking</code></td><td>Chai 18 / Chotki 33 (dispute bond) / Council 99, 99 seats; <code>lockBond</code>/<code>slashBond</code>/<code>releaseBond</code> by the resolver</td></tr>
+    <tr><td><code>UMAOptimisticResolver</code></td><td>OOv3 asserter. <code>proposeOutcome</code> (receiver only), <code>challengeOracleResult</code>, callbacks; <code>LIVENESS=30m</code>; dispute callbacks wrapped in try/catch so bonds always settle</td></tr>
+    <tr><td><code>MatchResultReceiver</code></td><td>CRE consumer (<code>ReceiverTemplate</code>). <code>requestMatchResult</code> (owner or <code>requester</code>), <code>onReport</code> (forwarder only), <code>requireWorkflowIdentity()</code> one-way</td></tr>
+    <tr><td><code>GaslessPaymaster</code></td><td>ERC-4337 v0.6 paymaster; allow-list of (target, selector), per-op / per-sender / global daily caps; gas deposit plus locked stake</td></tr>
+    <tr><td><code>BeadVestingWallet</code></td><td>OpenZeppelin vesting with cliff for team and seed buckets</td></tr>
+  </table>
+
+  <h3>Oracle report format</h3>
+  <pre><button class="copy" type="button">Copy</button><code>event MatchResolutionRequested(uint256 indexed matchId, uint256 indexed requestId, string fixtureId)
+report = abi.encode(uint64 chainSelector, uint256 requestId, uint256 matchId, uint8 outcome)
+outcome: 1 HOME_WIN, 2 AWAY_WIN, 3 DRAW, 4 CANCELLED      (PoolTypes.Outcome; 0 is never reported)
+Base Sepolia CRE chain selector: 10344971235874465080  (ethereum-testnet-sepolia-base-1)</code></pre>
+  <p>Workflow rules (<code>cre/resolve-match/outcome.ts</code>): FT/AET/PEN use <code>teams.home/away.winner</code> (both null = draw); PST/CANC/ABD/AWD/WO = cancelled; every other status throws so nothing is reported early;
+  non-empty <code>errors</code>, empty responses and a fixture-id mismatch also throw. Fixture ids must be numeric.</p>
+
+  <h3>Deploy order and sequence</h3>
+  <p>Circular dependencies are broken with one-time setters, in <code>script/DeployV1Base.s.sol</code>: BeadToken &rarr; TreasuryForwarder &rarr; <code>setTreasuryForwarder</code> &rarr; Pool &rarr; FactionToken impl &rarr; Registry &rarr; Necklace &rarr; Staking &rarr;
+  Resolver + Receiver &rarr; <code>setConsumer</code>, <code>setResolver</code> &rarr; <code>wire</code> &rarr; fee-exempt list &rarr; paymaster &rarr; optional renounce. Sign with a Foundry keystore (<code>--account X --sender ADDR</code>).</p>
+  <ol class="steps">
+    <li><code>cre login</code>, <code>cre account access</code>, then <code>cre workflow supported-chains</code> (forwarder and mock forwarder).</li>
+    <li>Deploy contracts with <code>CRE_FORWARDER</code> = the <b>mock</b> forwarder; call <code>requestMatchResult</code> on a locked match.</li>
+    <li>Put the receiver address in <code>cre/resolve-match/config.staging.json</code>; run <code>cre workflow simulate resolve-match --evm-tx-hash &lt;tx&gt; --broadcast --target staging-settings</code>.</li>
+    <li><code>setForwarderAddress(real forwarder)</code>; <code>cre workflow hash</code> (this is the workflow id; it depends on the config); <code>cre workflow deploy</code>.</li>
+    <li><code>setExpectedWorkflowId</code>, <code>setExpectedAuthor</code>, then <code>requireWorkflowIdentity()</code>. Required for production because the forwarder is shared by all CRE workflows. Never while the mock forwarder is set.</li>
+  </ol>
+
+  <h3>Configuration</h3>
+  <table>
+    <tr><th>File</th><th>Notes</th></tr>
+    <tr><td><code>contracts/.env.example</code></td><td>RPC, genesis wallets, vesting, UMA address and bond, <code>CRE_*</code>, <code>CRE_KEEPER</code>, <code>TRANSFER_RECEIVER_OWNERSHIP</code>, paymaster values. Foundry auto-loads <code>contracts/.env</code>: create it only for real deploys and delete it after</td></tr>
+    <tr><td><code>cre/.env.example</code></td><td><code>CRE_ETH_PRIVATE_KEY</code> (throwaway), <code>API_FOOTBALL_KEY_ENV</code>; leave <code>CRE_WORKFLOW_*</code> unset while simulating</td></tr>
+    <tr><td><code>webapp/.env.example</code></td><td><code>NEXT_PUBLIC_*</code> chain id, RPC, contract addresses, paymaster URL</td></tr>
+  </table>
+  <p>Verified Base Sepolia values: UMA OOv3 <code>0x0F7fC5E6482f096380db6158f978167b57388deE</code>, bond token <code>0x7E6d9618Ba8a87421609352d6e711958A97e2512</code> (TestnetERC20),
+  EntryPoint v0.6 <code>0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789</code>, Coinbase Smart Wallet factory <code>0x0BA5ED0c6AA8c49038F819E587E2633c4A9F428a</code>.</p>
+
+  <h3>Testing and rehearsal</h3>
+  <ul>
+    <li>129 Foundry tests: unit, fuzz, invariants, edge cases, deploy-script, oracle settlement (with mock forwarder and OOv3).</li>
+    <li>Local mocks: <code>mock/api-football-server.ts</code> (six fixture scenarios) and <code>mock/don-relay.ts</code> (stand-in for the DON).</li>
+    <li>Fork rehearsal: <code>anvil --fork-url https://sepolia.base.org --chain-id 84532 --port 8546</code>, deploy, then <code>contracts/script/rehearse-fork-cre.ps1</code> (real UMA OOv3; expects 1490 BEAD each).</li>
+  </ul>
+
+  <h3>Security model and trust assumptions</h3>
+  <ul>
+    <li>Reports are accepted only from the configured forwarder, for an open request, on the expected chain selector, once; with identity enforcement, only from the expected workflow id and author.</li>
+    <li>Receiver owner can change forwarder and identity settings: hand it to the Safe (<code>TRANSFER_RECEIVER_OWNERSHIP=true</code>) and use a separate <code>requester</code> key for routine requests.</li>
+    <li>Paymaster spends only on allow-listed calls within caps; it needs ETH deposit plus a locked stake at the EntryPoint.</li>
+    <li>Webapp: validated paymaster endpoint, security headers allowing Telegram framing only; keep real keys out of <code>NEXT_PUBLIC_*</code> variables.</li>
+    <li>Known limits: no external audit; CRE workflow has not run in the real runtime; API key is a normal secret (visible to node operators).</li>
+  </ul>
+
+  <h3>Gotchas</h3>
+  <ul>
+    <li>No git in this project by design. Libraries were installed with <code>forge install --no-git</code>.</li>
+    <li>Foundry <code>vm.prank</code>/<code>expectRevert</code> hit the next call (cache getters first); keep <code>vm.setEnv</code> scenarios in one test.</li>
+    <li>Do not leave deploy environment variables in a shell; they change the deploy-script test. <code>verify-all.ps1</code> clears them.</li>
+    <li>Behind a TLS-inspecting proxy set <code>NODE_OPTIONS=--use-system-ca</code>; never disable strict-ssl.</li>
+  </ul>
+</section>
+
+<!-- ============================ STATUS ============================ -->
+<section class="block" id="status" data-for="public team eng">
+  <h2>Status and what is pending</h2>
+  <table>
+    <tr><th>Item</th><th>State</th></tr>
+    <tr><td>Contracts, tests, deploy script</td><td class="tag-ok">Done (129 tests)</td></tr>
+    <tr><td>Fork rehearsal with real UMA, EntryPoint and wallet factory</td><td class="tag-ok">Passing</td></tr>
+    <tr><td>CRE workflow code, type-check, offline tests</td><td class="tag-ok">Done (14 tests)</td></tr>
+    <tr><td>Telegram mini-app</td><td class="tag-ok">Built, 0 known dependency vulnerabilities</td></tr>
+    <tr><td>Real CRE simulate and deploy</td><td class="tag-todo">Pending: login, deploy access, funded key, API key</td></tr>
+    <tr><td>Live Base Sepolia deployment</td><td class="tag-todo">Pending</td></tr>
+    <tr><td>Phone and bundler tests</td><td class="tag-todo">Pending</td></tr>
+    <tr><td>Mainnet inputs, legal, audit decision, liquidity</td><td class="tag-todo">Pending</td></tr>
+  </table>
+  <p>The detailed, maintained list lives in <a href="../HANDOFF.md">HANDOFF.md</a>.</p>
+</section>
+
+<!-- ============================ ASSESSMENT ============================ -->
+<section class="block" id="assessment" data-for="team eng">
+  <h2>Honest assessment: strengths, risks, costs and how to mitigate them</h2>
+  <span class="for">Internal view for the team and engineers. Remove this section before sharing the page publicly.</span>
+  <p>Bottom line: a good, unusually well-built experiment, but an <b>unproven product</b>. The pilot is cheap enough to find out. The real spend is on legal, liquidity and operations, not code.
+  This is a candid opinion, not legal or financial advice; cost figures are rough ballparks, not quotes.</p>
+
+  <h3>What is strong</h3>
+  <ul>
+    <li>An original, easy-to-explain mechanic: rival fans share a pool and balance is rewarded.</li>
+    <li>Regulatory thinking built in: no passive yield, no pre-sale, no treasury discretion, an NFT with non-financial utility only.</li>
+    <li>As read from the contracts, payouts do not depend on who wins, only on whether the match was played and the pool was balanced. That is far less like betting than typical sports tokens (legal must still confirm).</li>
+    <li>Solid pilot engineering: 129 tests, pool cap, refund fail-safes, rehearsal against the real UMA oracle.</li>
+  </ul>
+
+  <h3>Concerns and how to mitigate them</h3>
+  <table>
+    <tr><th>Concern</th><th>Why it matters</th><th>Mitigation</th></tr>
+    <tr><td><b>Why would anyone stake?</b></td><td>The bonus is subsidised by tokens. It motivates people only if $BEAD has value, and $BEAD has value only if people want it (circular).</td>
+      <td>Run a play-money or testnet season first. Let sponsors or community partners fund the bonus pool (stablecoin or BEAD) so rewards do not depend on the token price. Give non-financial reasons to join: rank, NFT status, team pride.</td></tr>
+    <tr><td><b>Cold start / thin pools</b></td><td>Both sides must show up at once, and the smaller side needs at least 30% of the pool for the bonus.</td>
+      <td>Start with marquee derbies and organised fan groups. Pre-seed a pool from the ecosystem allocation. Keep the live balance bar prominent, with matchday nudges when one side lags. Consider a documented, tested adjustment of the 30% floor only after real data.</td></tr>
+    <tr><td><b>1% transfer tax</b></td><td>Makes exchange, router and aggregator listings awkward and may cause failed swaps.</td>
+      <td>Test real DEX and wallet behaviour on testnet early. Keep the exemption list for pools and routers. Evaluate (with tests, since the transfer-tax design was intentional) charging the tax only on protocol actions such as deposits instead of every transfer.</td></tr>
+    <tr><td><b>No revenue for the team</b></td><td>The whole 1% goes to Protocol Guild, so usage earns the team nothing. Upside is limited to the 15% team allocation.</td>
+      <td>Explore sponsorship of pools, ecosystem grants (for example Base programs), and sponsor-funded paymaster budgets. Any change to who receives fees touches the legal design, so decide it with counsel first.</td></tr>
+    <tr><td><b>Oracle complexity</b></td><td>Heavy machinery (CRE, UMA, bonds) for a game where the winner does not change payouts.</td>
+      <td>Keep it for the pilot, because cancellations and tampering still matter. Revisit a simpler "match finished or cancelled" signal once real usage shows how often disputes happen.</td></tr>
+    <tr><td><b>Legal gray areas</b></td><td>A staking game tied to real matches needs review in each market.</td>
+      <td>Hire crypto-experienced counsel before mainnet. Geofence unsupported regions in the mini-app, publish terms, avoid any promise of return, keep unbranded names. Ask specifically whether the truce bonus (a few percent per match for locking tokens through a match, see the case studies) is seen as yield even though it is not passive holding.</td></tr>
+    <tr><td><b>Unaudited code</b></td><td>A single bug in the pool or paymaster can lose user funds.</td>
+      <td>Keep the hard pool cap low and raise it in steps. Add a bug bounty. Get an audit before large pools. Set up on-chain monitoring and alerts. Keep the Council circuit breaker and refund paths rehearsed.</td></tr>
+    <tr><td><b>Operational load</b></td><td>Someone must request results, watch disputes, and keep the paymaster funded.</td>
+      <td>Automate the keeper request, alert on open disputes and low paymaster balance, and write the runbook (key rotation, pause, forwarder change). Use the separate <code>requester</code> key so the owner can be the Safe.</td></tr>
+    <tr><td><b>Third-party dependencies</b></td><td>Chainlink CRE access and pricing are tenant-specific; the sports API and Telegram can change terms.</td>
+      <td>Confirm CRE access and cost before committing. Document a fallback result source. Pick a data provider with licence terms that fit commercial use.</td></tr>
+  </table>
+
+  <h3>Can it succeed?</h3>
+  <ul>
+    <li><b>As a technical showcase or learning pilot:</b> already a success.</li>
+    <li><b>As a real product with lasting users:</b> the odds are low, as with most token games, because demand is untested rather than because the code is weak.</li>
+  </ul>
+  <p>Run the pilot as an experiment with go/no-go numbers agreed <em>before</em> launch. Illustrative examples (the team should set its own):</p>
+  <table>
+    <tr><th>Measure</th><th>Why</th><th>Example bar</th></tr>
+    <tr><td>Stakers per match</td><td>Is there an audience at all?</td><td>Enough to fill the capped pool</td></tr>
+    <tr><td>Share of matches where the truce holds</td><td>Does the balance mechanic work?</td><td>Most matches meet the 30% floor</td></tr>
+    <tr><td>Return rate to a second match</td><td>Retention is the real signal</td><td>A clear share of first-timers come back</td></tr>
+    <tr><td>New versus returning wallets, support load</td><td>Growth quality and cost to run</td><td>Manageable by the current team</td></tr>
+  </table>
+  <p>Only spend on legal, audit and liquidity once those numbers look good.</p>
+
+  <h3>Where it costs money (rough ballparks)</h3>
+  <table>
+    <tr><th>Area</th><th>Size</th><th>Notes</th></tr>
+    <tr><td>Legal: token classification, terms, jurisdictions</td><td>Large, one-off</td><td>Likely the biggest early bill (often tens of thousands of dollars) and the gate to mainnet</td></tr>
+    <tr><td>Security audit</td><td>Large, one-off</td><td>Often well into five figures; the capped pilot plan skips it, which is a risk you accept</td></tr>
+    <tr><td>Liquidity and market making</td><td>Large, capital at risk</td><td>Not a fee, but real money; needs the lockup contract that is not built yet</td></tr>
+    <tr><td>Paymaster ETH</td><td>Small, recurring</td><td>The plan assumes 0.05 ETH to start; there is no on-chain fee to refill it, so top it up manually or via a sponsor</td></tr>
+    <tr><td>Chainlink CRE</td><td>Unknown</td><td>Deploy access needs approval; pricing is tenant-specific. Check before planning around it</td></tr>
+    <tr><td>Sports data API</td><td>Small to moderate</td><td>Free tier covers a pilot; official licensed data (Sportradar, Opta) costs far more</td></tr>
+    <tr><td>RPC, bundler, monitoring</td><td>Small, recurring</td><td>Free tiers at first, then tens to hundreds of dollars a month at scale</td></tr>
+    <tr><td>Web hosting and domain</td><td>Small</td><td>Free to about $20 a month early on</td></tr>
+    <tr><td>UMA bond</td><td>Capital, mostly returned</td><td>Posted per result and returned if nobody wins a dispute</td></tr>
+    <tr><td>Keeper, operations, support</td><td>People time</td><td>Requests, dispute watching, user help</td></tr>
+    <tr><td>Community and marketing</td><td>Variable</td><td>Probably the main driver of success or failure</td></tr>
+    <tr><td>Entity, accounting, tax, bug bounty</td><td>Moderate</td><td>A foundation structure only becomes necessary later</td></tr>
+  </table>
+  <p class="note">Match bonus pools are not a cash cost: they come from the ecosystem token allocation. Their <em>value</em>, however, depends on the token price.</p>
+
+  <h3>Suggested next steps, in order</h3>
+  <ol class="steps">
+    <li>Finish the testnet run (login, funded key, API key).</li>
+    <li>Run a no-real-money fan pilot and record the measures above.</li>
+    <li>Test the economics with a sponsor-funded bonus pool so rewards do not depend on $BEAD's price.</li>
+    <li>Speak to a crypto-experienced lawyer before spending on audit or liquidity.</li>
+    <li>Decide how the team is funded, since the current design pays it nothing from usage.</li>
+  </ol>
+</section>
+
+<!-- ============================ CASE STUDIES ============================ -->
+<section class="block" id="cases" data-for="team eng">
+  <h2>Case studies: three hypothetical match nights</h2>
+  <span class="for">Internal view. Figures are simulated, not real results, and must never be presented to the public as expected returns.</span>
+  <p>These are <b>simulations that run the real contracts</b> (not a separate model): deterministic pseudo-random crowds deposit, the match is locked, settled after the 30-minute window, and every fan claims.
+  The crowds, stakes and reward sizes are invented assumptions; the payouts, taxes and burns are what the code actually does.
+  Reproduce them with <code>cd contracts; forge test --match-contract ScenarioSimulations -vv</code> (source: <code>contracts/test/ScenarioSimulations.t.sol</code>).
+  All amounts are in BEAD; returns are net of the 1% deposit tax.</p>
+
+  <h3>Case 1: a healthy derby night</h3>
+  <p><b>Setup.</b> 150 fans stake 100 to 999 BEAD (every 20th fan five times that), about 55% on Red. The ecosystem funds a 3,000 BEAD reward pool. One big Red fan and one big White fan swap 54 rival tokens each and forge a necklace.</p>
+  <table>
+    <tr><th>Measure</th><th>Result</th></tr>
+    <tr><td>Total staked (gross)</td><td>102,236</td></tr>
+    <tr><td>Peace Tax sent to Protocol Guild</td><td>1,022</td></tr>
+    <tr><td>Net stake Red / White</td><td>54,407 / 46,590 (White is 46%)</td></tr>
+    <tr><td>Truce held?</td><td class="tag-ok">Yes</td></tr>
+    <tr><td>Bonus paid Red / White</td><td>1,500 / 1,500 (2.75% and 3.21% of staked BEAD)</td></tr>
+    <tr><td>Fan return after the 1% tax</td><td>+1.72% to +2.18%, average +1.90%</td></tr>
+    <tr><td>Necklaces forged / BEAD burned</td><td>2 / 216 (the forgers give up the bonus on the burned tokens)</td></tr>
+  </table>
+  <p><b>What it shows.</b> Balanced crowds are rewarded and the forge path works end to end. The bonus here costs the funder 3,000 BEAD for a 102k pool (about 2.9% per match). That is a subsidy, so it only lasts while someone keeps funding it.</p>
+
+  <h3>Case 2: a lopsided home crowd</h3>
+  <p><b>Setup.</b> Same rules and reward, but about 90% of fans pick Red.</p>
+  <table>
+    <tr><th>Measure</th><th>Result</th></tr>
+    <tr><td>Total staked (gross)</td><td>102,980</td></tr>
+    <tr><td>Net stake Red / White</td><td>84,650 / 17,299 (White is 17%)</td></tr>
+    <tr><td>Truce held?</td><td class="tag-todo">No</td></tr>
+    <tr><td>Fan return</td><td>-1.00% for everyone (only the tax is lost)</td></tr>
+    <tr><td>Reward pool</td><td>3,000 returned to the funder; Protocol Guild still receives 1,029</td></tr>
+  </table>
+  <p>Where is the cliff? A sweep with a fixed 100,000 BEAD pool and 3,000 reward shows the bonus switching on at exactly 30% and favouring the smaller side:</p>
+  <table>
+    <tr><th>Smaller side's share</th><th>Truce</th><th>Larger side bonus</th><th>Smaller side bonus</th></tr>
+    <tr><td>10%, 20%, 25%, 29%</td><td class="tag-todo">No</td><td>0%</td><td>0%</td></tr>
+    <tr><td>30%</td><td class="tag-ok">Yes</td><td>2.16%</td><td>5.05%</td></tr>
+    <tr><td>35%</td><td class="tag-ok">Yes</td><td>2.33%</td><td>4.32%</td></tr>
+    <tr><td>45%</td><td class="tag-ok">Yes</td><td>2.75%</td><td>3.36%</td></tr>
+    <tr><td>50%</td><td class="tag-ok">Yes</td><td>3.03%</td><td>3.03%</td></tr>
+  </table>
+  <p><b>What it shows.</b> The mechanic does steer people to the weaker side (the smaller side earns more per BEAD), but it is an all-or-nothing cliff: at 29% a lopsided pool simply costs every fan 1% for nothing.
+  <b>Mitigations to evaluate:</b> live "your side needs X more" nudges and matchday campaigns in the mini-app; show the cliff clearly before people stake; and consider a smoother payout curve than a hard 30% line (a contract change that needs full re-testing and legal review).</p>
+
+  <h3>Case 3: a whale pads the weak side</h3>
+  <p><b>Setup.</b> The honest crowd is 60 Red fans and 10 White fans staking 1,000 each (White is 14%, so no truce). A capital-rich wallet then deposits 16,300 BEAD on White, just enough to push White past 30%. We run it with a 3,000 and a 500 BEAD reward.</p>
+  <table>
+    <tr><th>Run</th><th>Truce</th><th>Honest fans (average)</th><th>Funder</th><th>Whale</th></tr>
+    <tr><td>No whale, reward 3,000</td><td class="tag-todo">No</td><td>-1.00%</td><td>Gets 3,000 back</td><td>n/a</td></tr>
+    <tr><td>Whale pads, reward 3,000</td><td class="tag-ok">Yes</td><td>+1.95%</td><td>Pays out all 3,000</td><td><b>+766 BEAD (+4.7%)</b>, holds 62% of White</td></tr>
+    <tr><td>Whale pads, reward 500</td><td class="tag-ok">Yes</td><td>-0.51%</td><td>Pays out 500</td><td>-8 BEAD (-0.04%)</td></tr>
+  </table>
+  <p><b>What it shows.</b> This is not theft: the whale pays the 1% tax, locks its capital through the match, and the honest fans actually end up better off (+1.95% instead of -1.00%). But it is bonus farming:
+  the whale took about 31% of the reward as bonus (about 26% after its tax) for one cheap deposit, because the 1% tax is the only cost of participating and the 30% cliff makes padding cheap. Padding pays whenever the weaker side's bonus rate is above roughly 1%.
+  Break-even is about <code>reward &gt; 0.02 &times; padding / whale share of the side</code>, which here is about 526 BEAD.</p>
+  <p><b>Mitigations to evaluate</b> (each is a design choice; any contract change needs new tests and legal review):</p>
+  <ul>
+    <li><b>Size the reward to the pool.</b> A reward below about 0.5-1% of the pool removes the incentive, but also most of the appeal.</li>
+    <li><b>Smooth the cliff</b> so padding earns in proportion instead of unlocking a lump sum.</li>
+    <li><b>Per-wallet caps</b> on stake or bonus. Weak alone because wallets are cheap and fees are sponsored; pair with wallet verification or reputation if you want them to bite.</li>
+    <li><b>Early-deposit weighting</b> so last-minute padding earns less than early participation.</li>
+    <li><b>Source the bonus from sponsors</b> rather than the token allocation, so a padded truce costs the project less.</li>
+    <li><b>Monitor</b> deposit concentration per side and alert the team when one wallet holds most of the minority side.</li>
+  </ul>
+
+  <h3>What the three cases say together</h3>
+  <ul>
+    <li>The contracts behaved as designed in all three cases: every claim executed without a revert and the payouts matched the rules. This is a behaviour check of a few crowds, not a proof of correctness.</li>
+    <li>Fans earn a bonus of about 2-5% of their stake per match when the truce holds and lose 1% when it fails. That is real money per match, so the reward size is the main economic dial, and a legal question (could it be seen as yield?).</li>
+    <li>The weak points are product and incentive design (the cliff, farming, who funds the bonus), not smart-contract bugs.</li>
+  </ul>
+</section>
+
+<!-- ============================ FINDINGS AND CONCLUSION ============================ -->
+<section class="block" id="conclusion" data-for="team eng">
+  <h2>Findings and conclusion</h2>
+  <span class="for">Internal view. Opinion based on the code, the tests and the simulations above; not legal or financial advice.</span>
+
+  <h3>Findings</h3>
+  <ol class="steps">
+    <li><b>The mechanics work as coded.</b> 129 tests pass and three simulated match nights ran end to end on the real contracts with correct taxes, bonuses, refunds and burns.</li>
+    <li><b>The winner of the match does not change who gets paid.</b> Settlement treats a home win, an away win and a draw the same way; the result only decides "played" versus "cancelled" and when claims open. The sports result is a calendar and a story, not a bet. That makes the oracle stack and sports-data licensing heavy for what they decide.</li>
+    <li><b>The bonus is a subsidy, not income.</b> In the simulations it is worth roughly 2-5% of stake per match, paid from a reward pool that someone funded. In the token model the funder pays in the project's own token, which is circular.</li>
+    <li><b>The 30% line is a cliff.</b> At 29% nobody gets a bonus; at 30% the bonus switches on. That invites last-minute padding of the weak side (Case 3) and means a lopsided crowd simply loses the 1% tax for nothing (Case 2).</li>
+    <li><b>Steering works.</b> The smaller side earns more per BEAD (5.05% versus 2.16% at the 30% line), which nudges fans toward balance as intended.</li>
+    <li><b>The 1% tax is never returned</b>, even on a refund, and it goes entirely to Protocol Guild. Good for the story and for trust; it also means usage earns the team nothing.</li>
+    <li><b>Weak points are product and incentive design, not code.</b> No simulated case revealed a funds-loss bug, but this is a behaviour check of a few crowds, not an audit.</li>
+  </ol>
+
+  <h3>Conclusion</h3>
+  <p>Necklace Chain is technically sound and unusually well tested for a pilot, but as currently framed it has no outside payer. Fans want belonging and status. Sponsors, leagues and public-good funders want positive engagement.
+  The token only moves value between the participants themselves, so the rewards can only be paid by early token holders or by the project. That is the <b>real problem</b>: not "can we build it" (we can) but "who benefits and who pays".</p>
+  <p>The strongest parts of the work are reusable infrastructure: a balanced-pool mechanism, a Chainlink CRE to UMA settlement pipeline with refunds and fail-safes, gasless onboarding in Telegram, immutable public-good forwarding, and a non-financial tenure credential. The weakest part is the token-and-bonus framing, which carries the circular economics and the legal question about yield.</p>
+  <table>
+    <tr><th>Dimension</th><th>Verdict</th><th>Why</th></tr>
+    <tr><td>Technology</td><td class="tag-ok">Strong</td><td>Tested, simulated, rehearsed against the real oracle contract</td></tr>
+    <tr><td>Demand</td><td class="tag-todo">Unproven</td><td>No real fans have used it</td></tr>
+    <tr><td>Economics as designed</td><td class="tag-todo">Weak</td><td>Circular reward funding, no team revenue, farmable cliff</td></tr>
+    <tr><td>Legal position</td><td class="tag-todo">Unresolved</td><td>The bonus may be seen as yield; counsel not yet engaged</td></tr>
+    <tr><td>Reusable value</td><td class="tag-ok">High</td><td>Most of the code works without the token</td></tr>
+  </table>
+  <div class="note ok"><b>Recommendation in one line:</b> keep the engine, change the business model. Reposition from a token game to a sponsor-funded fan-unity platform with the settlement infrastructure as a reusable asset, and make $BEAD optional until demand is proven.</div>
+</section>
+
+<!-- ============================ ALTERNATIVES ============================ -->
+<section class="block" id="alternatives" data-for="team eng">
+  <h2>Other ways to use Necklace Chain</h2>
+  <span class="for">Internal view. Ideas to evaluate, each reusing most of the existing code</span>
+  <table>
+    <tr><th>Idea</th><th>Real problem it solves</th><th>What we reuse</th><th>What changes</th><th>Effort and risk</th></tr>
+    <tr><td><b>A. Sponsor-funded fan-unity campaign (no token)</b><br>Fans join free or with a refundable deposit; balanced turnout unlocks a prize pool funded by a sponsor; the NFT is the badge.</td>
+      <td>Brands, leagues and fan groups want measurable, positive rivalry engagement. Fans get belonging and perks without risking money.</td>
+      <td>Pool state machine, registry, oracle path, necklace, gasless Telegram flow</td>
+      <td>Funder is a sponsor; deposits in a stablecoin or points; the 1% becomes optional or a voluntary donation</td>
+      <td>Medium effort. Lower risk (no token), still check prize and promotion rules by region</td></tr>
+    <tr><td><b>B. "Truce Fund" charity matching</b><br>Fans pledge; if both sides show up in balance, a sponsor matches the pledges and the total goes to a public good.</td>
+      <td>Giving with social proof and matching funds, instead of rewards paid to participants.</td>
+      <td>Immutable forwarder to a fixed recipient, balance rule, oracle timing, NFT as donor badge</td>
+      <td>No principal return (donations); recipient must be a verified charity or public-good program</td>
+      <td>Medium effort. Fundraising and charity law apply, but there is no yield question</td></tr>
+    <tr><td><b>C. Cross-fan loyalty passport</b><br>A tenure-based credential for engaging with both sides, with perks from clubs and sponsors.</td>
+      <td>Fan identity and loyalty programs are siloed per club and cost a lot to run off-chain.</td>
+      <td>Cosmic Necklace tenure, voting weight and rebate logic; smart-wallet onboarding; Telegram app</td>
+      <td>Issue by participation rather than a burn; add partner perk integrations</td>
+      <td>Low to medium effort. Low legal risk; needs partners</td></tr>
+    <tr><td><b>D. Refundable-deposit escrow for community events</b><br>Entry fees or prize pools held until an objective result, with automatic refund if cancelled or the data goes silent.</td>
+      <td>Trust in how small tournaments and community events handle money, and clean refunds after weather or no-shows.</td>
+      <td>Pool, oracle and challenge window, refund fail-safes, paymaster</td>
+      <td>Drop the truce symmetry rule; generalise outcomes; likely a stablecoin</td>
+      <td>Medium effort. Moderate risk: money handling and prize-pool rules vary by region</td></tr>
+    <tr><td><b>E. Open-source settlement toolkit and showcase</b><br>Package the CRE to UMA settlement template, gasless Telegram flow, tests and rehearsal scripts as a reference.</td>
+      <td>Few public references exist for building on Chainlink CRE with UMA; the team also needs a sustainable path (grants, consulting, credibility).</td>
+      <td>Nearly everything: contracts, workflow, mocks, scripts, docs</td>
+      <td>Genericise names, add a licence, trim the token-specific parts</td>
+      <td>Low effort and low risk; revenue is indirect</td></tr>
+  </table>
+  <p>A and E combine well: A tests whether real people care, E keeps the investment useful whatever the answer is.</p>
+</section>
+
+<!-- ============================ RECOMMENDATIONS ============================ -->
+<section class="block" id="recommendations" data-for="team eng">
+  <h2>Recommendations: solving the real problem</h2>
+  <span class="for">Internal view. Ordered by what unlocks the most learning for the least spend</span>
+
+  <h3>Problems and what to do about each</h3>
+  <table>
+    <tr><th>Problem</th><th>Recommendation</th></tr>
+    <tr><td><b>No outside payer.</b> Rewards come from the participants' own token.</td>
+      <td>Line up one or two partners (a local club, a fan group, a brand or a charity) before more building. Ask for a written letter of intent to fund a campaign. Make sponsor funding the default way a reward pool gets paid.</td></tr>
+    <tr><td><b>Demand is unproven.</b></td>
+      <td>Run a no-money pilot (testnet or points) with real fan groups, and agree the success and stop numbers first: stakers per match, share of matches where the truce holds, return rate to a second match, support load.</td></tr>
+    <tr><td><b>Incentive flaws:</b> hard 30% cliff, padding, reward sizing.</td>
+      <td>Before real money, evaluate a smoother payout curve, limits on one wallet's share of a side, early-deposit weighting and a reward sized to the pool. Re-run the scenario simulations as a regression for every change.</td></tr>
+    <tr><td><b>Legal exposure</b> from a token with a bonus that may look like yield.</td>
+      <td>Engage crypto-experienced counsel early and ask about the bonus specifically. Prefer tracks A, B or C, which avoid issuing a token, until counsel says otherwise. Never describe the bonus as a return.</td></tr>
+    <tr><td><b>No revenue and a thin team budget.</b></td>
+      <td>Pursue sponsorship fees, licensing or white-label work (idea E), and ecosystem grants. Decide any change to who receives the 1% together with counsel, since it affects the regulatory design.</td></tr>
+    <tr><td><b>Operational and security risk.</b></td>
+      <td>Keep the pool cap low and raise it in steps; get an audit or bounty before raising it much; automate the keeper and alerting; finish the real testnet run.</td></tr>
+  </table>
+
+  <h3>Recommended path with decision gates</h3>
+  <ol class="steps">
+    <li><b>Finish the testnet run.</b> It is cheap and proves the technology end to end with the real CRE network (login, funded key, API key).</li>
+    <li><b>No-money fan pilot.</b> Two or three real fan groups, points or testnet only, with the agreed measures.<br><b>Gate 1:</b> if people come back for a second match, continue. If not, pivot to idea E (and C if partners are interested) rather than spending on legal and audit.</li>
+    <li><b>Secure a sponsor or partner</b> for a funded campaign (idea A or B). <b>Gate 2:</b> no funded partner means no mainnet launch.</li>
+    <li><b>Fix the incentive design</b> (smooth the cliff, concentration limits, reward sizing), re-test with the simulation harness, and get the legal opinion.</li>
+    <li><b>Capped real-money or no-token pilot.</b> Audit or bounty before any cap increase; add a liquidity plan only if a token is still part of the design.</li>
+  </ol>
+
+  <h3>Which track fits when</h3>
+  <table>
+    <tr><th>Track</th><th>Choose it when</th><th>Needs</th></tr>
+    <tr><td><b>A. Sponsor-funded campaign</b> (primary)</td><td>Fans respond in the pilot and a partner will fund prizes</td><td>Partner LOI, perk or prize design, legal check on promotions</td></tr>
+    <tr><td><b>B. Truce Fund</b></td><td>A charity or public-good partner wants matching and social proof</td><td>Verified recipient, fundraising compliance</td></tr>
+    <tr><td><b>C. Loyalty passport</b></td><td>Clubs or leagues want a cross-fan credential</td><td>Partner perks and data-sharing terms</td></tr>
+    <tr><td><b>D. Event escrow</b></td><td>Community organisers want trustworthy prize and refund handling</td><td>Stablecoin, region-specific rules</td></tr>
+    <tr><td><b>E. Open-source toolkit</b> (hedge, in parallel)</td><td>Always: it keeps the investment useful whatever happens</td><td>Licence, cleanup, documentation</td></tr>
+    <tr><td><b>Token pilot</b> (last)</td><td>Demand is proven, a sponsor funds rewards, counsel approves, mitigations are in</td><td>Audit, liquidity plan, legal sign-off</td></tr>
+  </table>
+
+  <h3>What not to do</h3>
+  <ul>
+    <li>Do not launch token liquidity before there is proof of demand and a funded reward source.</li>
+    <li>Do not promise or imply returns, in the app, in the Telegram channel or in this page's public sections.</li>
+    <li>Do not raise pool caps before an audit or bounty, and do not use real club or league marks.</li>
+    <li>Do not treat the passing test suite as proof that the economics work: it shows the code does what it says, not that people will use it.</li>
+  </ul>
+</section>
+
+<!-- ============================ FUTURE SECTORS ============================ -->
+<section class="block" id="sectors" data-for="team eng">
+  <h2>Future sectors: where this technology could be used, with real cases</h2>
+  <span class="for">Internal view. Research done 2026-10-07 from the public pages listed at the end; no partner has been contacted</span>
+
+  <h3>What is reusable (the building blocks)</h3>
+  <table>
+    <tr><th>Building block</th><th>Where it lives in the code</th></tr>
+    <tr><td><b>1. Objective-event escrow:</b> money is held until a verified real-world fact arrives, with a challenge window and automatic refunds if the data is late, wrong or never comes</td><td><code>EkecheiriaPool</code>, <code>MatchResultReceiver</code>, <code>UMAOptimisticResolver</code>, CRE workflow</td></tr>
+    <tr><td><b>2. Balance-conditioned matching:</b> an extra pool unlocks only when participation is broad enough</td><td>30% symmetry rule and bonus split in <code>EkecheiriaPool</code></td></tr>
+    <tr><td><b>3. Public-good forwarding:</b> a fixed recipient receives a share in the same transaction, with no custody</td><td><code>TreasuryForwarder</code></td></tr>
+    <tr><td><b>4. Gasless passkey onboarding inside a chat app</b></td><td>Telegram mini-app, Coinbase Smart Wallet, <code>GaslessPaymaster</code></td></tr>
+    <tr><td><b>5. A tenure credential</b> that grows with time held</td><td><code>CosmicNecklace</code></td></tr>
+  </table>
+
+  <h3>Sectors, real cases and how they fit</h3>
+  <p>Evidence labels: <b>Verified</b> means the fact is stated on the source page listed below (often self-reported by the company). <b>Hypothesis</b> means I found no real case and it is only an idea.</p>
+  <table>
+    <tr><th>Sector</th><th>Real case (evidence)</th><th>Why it fits what we built</th><th>What would change</th><th>Main risk</th><th>Fit</th></tr>
+    <tr><td><b>Parametric insurance for farmers and communities</b></td>
+      <td>Etherisc describes itself as a pioneer in parametric blockchain insurance since 2016, with a flight-delay product, Chainlink weather data for crop cover in Kenya, and press quotes that it processed payouts for some of 17,000+ smallholder farmers with ACRE Africa, plus an Oxfam weather-index product in Sri Lanka. Arbol reports $2+ billion of notional climate risk transferred in 15+ countries, with payment as little as two weeks after objective data is verified. <i>Verified (company pages)</i></td>
+      <td>The same flow: objective data triggers an automatic payout. We add a challenge window, refund fail-safes and a gasless chat-app onboarding that suits phone-first users.</td>
+      <td>Swap the sports feed for a weather or index source; add pricing and capital providers; work through a licensed insurer or partner instead of becoming one</td>
+      <td>Insurance licensing and underwriting. Do not try to be the insurer.</td>
+      <td class="tag-ok">High</td></tr>
+    <tr><td><b>Disaster relief and conditional cash transfers</b></td>
+      <td>Etherisc cites its technology disbursing relief funds after Hurricane Maria in Puerto Rico. <i>Verified (press quote on etherisc.com)</i></td>
+      <td>Funds are released when a verified trigger is met, with an audit trail; the refund path returns unused funds to the funder.</td>
+      <td>One-way payouts to beneficiaries; identity and anti-fraud checks; partner NGO</td>
+      <td>Beneficiary identity, fraud and local rules</td>
+      <td class="tag-ok">Medium to high</td></tr>
+    <tr><td><b>Charity and public-goods matching</b></td>
+      <td>Quadratic funding, described by Buterin, Hitzig and Weyl and used by Gitcoin, matches many small donations from a central fund. In the published example a project with 20 donors of $50 receives $7,407 of matching, while a project with 2 donors of $500 receives $741. <i>Verified (wtfisqf.com)</i>. Protocol Guild is our own verified public-goods recipient.</td>
+      <td>The "breadth beats size" idea is the same instinct as our balance rule, and the forwarder already sends money to a fixed recipient.</td>
+      <td>Matching funds from a sponsor; weight by number of distinct people instead of stake size</td>
+      <td>Fake-identity gaming, exactly like our whale finding. Needs identity or reputation checks.</td>
+      <td class="tag-ok">High</td></tr>
+    <tr><td><b>Sports-for-peace and community sport programmes</b></td>
+      <td>PeacePlayers International is a non-profit that uses basketball to unite and educate children and their communities; Wikipedia lists it as established in 2001 and notes a 2017 partnership with Nike. <i>Verified, but only a short secondary summary: check their site and impact reports directly</i></td>
+      <td>This is the original purpose of the project. A sponsor-funded campaign with a non-profit partner and the necklace as a participation badge matches it without needing a token.</td>
+      <td>No token; sponsor-funded rewards; partner supplies the audience and programme credibility</td>
+      <td>Partner approval, safeguarding rules for minors, trademark use</td>
+      <td class="tag-ok">High</td></tr>
+    <tr><td><b>Fan and community loyalty inside chat apps</b></td>
+      <td>Telegram reports 1 billion+ monthly users (March 2025). It sells collectible gifts registered as NFTs on the TON blockchain and lets mini-apps use group context and payments. Telegram was also removed from Apple's App Store for part of a day on 3 August 2026 and temporarily blocked in India in June 2026. <i>Verified (Wikipedia and Telegram docs)</i></td>
+      <td>Our tenure credential and gasless onboarding are a ready-made status system for a community or creator.</td>
+      <td>Issue by participation rather than by burning; perks from partners</td>
+      <td>Platform dependency: store removals, country blocks, policy changes</td>
+      <td class="tag-todo">Medium</td></tr>
+    <tr><td><b>Result-resolution infrastructure for other builders</b></td>
+      <td>UMA's own documentation lists prediction markets, sports-betting apps and insurance protocols as primary uses of its optimistic oracle, and cross-chain verification and content moderation for the newer version we use. <i>Verified (docs.uma.xyz)</i></td>
+      <td>We already have a tested CRE to UMA to pool template, mocks, a fork rehearsal and a runbook.</td>
+      <td>Genericise names, document, licence it, offer integration help</td>
+      <td>Revenue is indirect; relies on CRE and UMA staying available</td>
+      <td class="tag-ok">High (low effort)</td></tr>
+    <tr><td><b>Event deposits, tournament prize pools, ticket refunds</b></td>
+      <td>I did not find a verified case. <i>Hypothesis</i></td>
+      <td>Refund-on-cancel and silent-oracle protection are exactly what small events lack.</td>
+      <td>Drop the truce rule; add organiser roles and payouts</td>
+      <td>Prize-pool and gambling rules vary by place; unproven demand</td>
+      <td class="tag-todo">Low to medium</td></tr>
+  </table>
+
+  <h3>What the research says</h3>
+  <ul>
+    <li><b>The proven demand is for objective-trigger payouts</b> (insurance and relief), where an outside party has a real reason to pay and a payout rule that nobody argues about. That is the problem our oracle and refund machinery already solves.</li>
+    <li><b>Matching mechanisms are established but need identity checks.</b> Quadratic funding exists because broad support is worth more than big cheques, and it has to defend against fake participants. Our whale simulation found the same weakness.</li>
+    <li><b>Outcome betting draws gambling regulators.</b> Polymarket, the best-known prediction market, trades mostly sports markets and, per Wikipedia, has been blocked or banned in many jurisdictions, and Minnesota enacted a law banning prediction markets from 1 August 2026, which the US Department of Justice moved to challenge. Necklace Chain pays the same regardless of who wins; keep it that way, and ask counsel about any change that ties payouts to results.</li>
+    <li><b>Chat-app reach is large but borrowed.</b> Telegram's audience is a strength and a dependency. Keep the contracts and wallet independent of any one platform.</li>
+  </ul>
+
+  <h3>Suggested order, and the most promising real-world fit</h3>
+  <ol class="steps">
+    <li><b>Sponsor-funded unity campaign with a sports-for-peace non-profit</b> (original purpose, no token, lowest regulatory weight). Approach organisations like PeacePlayers International and local fan groups after checking their current programmes.</li>
+    <li><b>Charity matching variant</b> using the forwarder and a verified recipient, once identity checks are chosen.</li>
+    <li><b>Parametric community cover through an existing provider</b> (Etherisc- or Arbol-type partners): we supply the settlement, challenge and refund layer and the Telegram onboarding; the partner supplies licence, pricing and capital. This is the largest real problem and the biggest build.</li>
+    <li><b>Open-source resolution toolkit</b> in parallel as a low-cost hedge.</li>
+  </ol>
+
+  <h3>Caveats</h3>
+  <ul>
+    <li>The figures are self-reported by the companies or taken from Wikipedia, with the dates shown on those pages; check primary sources before quoting them outside the team.</li>
+    <li>None of these organisations has been contacted, and nothing here implies their interest or endorsement.</li>
+    <li>New sectors bring their own licences and laws (insurance, fundraising, prize pools). Treat each as a separate legal review.</li>
+  </ul>
+
+  <h3>Sources read for this section</h3>
+  <ul>
+    <li><a href="https://etherisc.com/">etherisc.com</a> (parametric insurance, ACRE Africa, Oxfam, Hurricane Maria quotes)</li>
+    <li><a href="https://www.arbol.io/">arbol.io</a> (parametric climate cover, notional risk, payout timing)</li>
+    <li><a href="https://wtfisqf.com/">wtfisqf.com</a> (quadratic funding explainer and worked example)</li>
+    <li><a href="https://en.wikipedia.org/wiki/PeacePlayers_International">Wikipedia: PeacePlayers International</a></li>
+    <li><a href="https://docs.uma.xyz/">docs.uma.xyz</a> (optimistic oracle use cases)</li>
+    <li><a href="https://en.wikipedia.org/wiki/Polymarket">Wikipedia: Polymarket</a> (regulatory history)</li>
+    <li><a href="https://en.wikipedia.org/wiki/Telegram_(software)">Wikipedia: Telegram</a> and <a href="https://core.telegram.org/bots/webapps">Telegram Mini Apps docs</a></li>
+  </ul>
+</section>
+
+<!-- ============================ GLOSSARY ============================ -->
+<section class="block" id="glossary" data-for="public team eng">
+  <h2>Glossary</h2>
+  <table>
+    <tr><th>Term</th><th>Meaning</th></tr>
+    <tr><td>$BEAD</td><td>The protocol's ERC-20 game token</td></tr>
+    <tr><td>Ekecheiria / Truce Pool</td><td>The per-match pool; named for the ancient Olympic truce</td></tr>
+    <tr><td>Peace Tax</td><td>1% of each transfer forwarded to Protocol Guild</td></tr>
+    <tr><td>Faction token</td><td>1:1 receipt for a deposit on the Home or Away side</td></tr>
+    <tr><td>Cosmic Necklace / Rama Node</td><td>The forged, non-financial NFT credential</td></tr>
+    <tr><td>Chai / Chotki / Master Council</td><td>Staking tiers (18 / 33 / 99 $BEAD)</td></tr>
+    <tr><td>CRE</td><td>Chainlink Runtime Environment, the decentralised workflow network that reports match results (replaced the sunset Chainlink Functions)</td></tr>
+    <tr><td>UMA OOv3</td><td>Optimistic Oracle V3: accepts a result unless it is challenged within the window</td></tr>
+    <tr><td>Paymaster</td><td>ERC-4337 contract that pays network fees for allowed player actions</td></tr>
+    <tr><td>Council Executor</td><td>The multisig that carries out passed governance decisions</td></tr>
+    <tr><td>Protocol Guild</td><td>Collective funding Ethereum core contributors; the public-goods recipient</td></tr>
+  </table>
+</section>
+
+</main>
+
+<footer>
+  <p>Necklace Chain is an experimental pilot. Nothing on this page is an offer, investment advice, or a promise of any return. Not affiliated with any sports club, league or federation.
+  Technical facts reflect the repository as of 2026-10-07; check <a href="../HANDOFF.md">HANDOFF.md</a> for the latest status.</p>
+</footer>
+
+<script>
+(function () {
+  var buttons = document.querySelectorAll('.aud button');
+  var blocks = document.querySelectorAll('section.block');
+  function show(aud) {
+    buttons.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.aud === aud)); });
+    blocks.forEach(function (s) {
+      var list = (s.dataset['for'] || '').split(' ');
+      s.hidden = !(aud === 'all' || list.indexOf(aud) !== -1);
+    });
+    try {
+      var u = new URL(location.href);
+      if (aud === 'all') u.searchParams.delete('for'); else u.searchParams.set('for', aud);
+      history.replaceState(null, '', u.toString());
+    } catch (e) {}
+  }
+  buttons.forEach(function (b) { b.addEventListener('click', function () { show(b.dataset.aud); }); });
+  var start = new URLSearchParams(location.search).get('for');
+  if (['public', 'team', 'eng'].indexOf(start) !== -1) show(start);
+
+  document.querySelectorAll('pre button.copy').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var text = btn.parentElement.querySelector('code').innerText;
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(function () { btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1200); });
+    });
+  });
+})();
+</script>
+</body>
+</html>
